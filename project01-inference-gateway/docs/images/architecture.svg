@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Inference gateway architecture</title>
+  <desc id="description">A client calls a Python HTTP gateway. The gateway validates and limits requests, sets a deadline, schedules among registered workers using capacity, weight, and latency, checks circuit breakers, then calls local workers that simulate inference or an optional Ollama adapter for a real local model. Structured logs and Prometheus metrics provide telemetry.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f7faff"/><stop offset="1" stop-color="#eef4fb"/></linearGradient>
+    <linearGradient id="gateway" x1="0" x2="1"><stop stop-color="#f8fbff"/><stop offset="1" stop-color="#f2f8ff"/></linearGradient>
+    <filter id="shadow" x="-15%" y="-30%" width="130%" height="160%"><feDropShadow dx="0" dy="7" stdDeviation="10" flood-color="#183b60" flood-opacity="0.10"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2876aa"/></marker>
+    <marker id="darrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#879bad"/></marker>
+    <style>
+      .title{font:700 38px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#102a43}
+      .sub{font:18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#536b82}
+      .group{font:700 22px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#123b5d}
+      .head{font:700 20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#153954}
+      .body{font:16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#50677a}
+      .small{font:14px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#5a7285}
+      .line{fill:none;stroke:#2876aa;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow)}
+      .state{fill:none;stroke:#879bad;stroke-width:2.5;stroke-dasharray:7 7;stroke-linecap:round;marker-end:url(#darrow)}
+      .card{fill:white;stroke:#cfdeea;stroke-width:2;filter:url(#shadow)}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <text x="66" y="73" class="title">Inference gateway architecture</text>
+  <text x="66" y="109" class="sub">One client contract; bounded admission, adaptive routing, and visible failure handling.</text>
+
+  <!-- Group containers -->
+  <rect x="328" y="158" width="872" height="620" rx="26" fill="url(#gateway)" stroke="#a7c9e3" stroke-width="2.5"/>
+  <rect x="1228" y="158" width="306" height="620" rx="26" fill="#f3fbf8" stroke="#9fcbbd" stroke-width="2.5"/>
+  <text x="365" y="201" class="group">Gateway · Python 3.9+ standard library</text>
+  <text x="1259" y="201" class="group">Upstream workers</text>
+
+  <!-- Flow lines behind cards -->
+  <path class="line" d="M290 368 H370"/>
+  <path class="line" d="M596 291 H623"/>
+  <path class="line" d="M849 291 H873"/>
+  <path class="line" d="M1005 349 V372 H780 V397"/>
+  <path class="line" d="M782 515 V538 H1030 V555"/>
+  <path class="line" d="M1145 638 H1211 V290 H1256"/>
+  <path class="line" d="M1211 430 H1256"/>
+  <path class="line" d="M1211 570 H1256"/>
+  <path class="state" d="M687 515 V545 H523 V554"/>
+  <path class="state" d="M790 515 V547 H784 V555"/>
+  <path class="state" d="M327 695 H291"/>
+
+  <!-- Client -->
+  <rect x="64" y="296" width="226" height="145" rx="18" class="card"/>
+  <rect x="83" y="315" width="43" height="43" rx="12" fill="#e3f1fb"/>
+  <path d="M95 329l-6 7 6 7m20-14l6 7-6 7m-15 10l7-22" fill="none" stroke="#2876aa" stroke-width="3" stroke-linecap="round"/>
+  <text x="144" y="343" class="head">Client</text>
+  <text x="83" y="386" class="body">POST /v1/infer</text>
+  <text x="83" y="413" class="small">Optional X-Tenant-ID</text>
+
+  <!-- HTTP boundary -->
+  <rect x="371" y="234" width="225" height="115" rx="17" class="card"/>
+  <rect x="371" y="234" width="225" height="10" rx="5" fill="#2c8fb8"/>
+  <text x="391" y="278" class="head">HTTP boundary</text>
+  <text x="391" y="307" class="body">Parse and validate</text>
+  <text x="391" y="331" class="small">Body / fields / model</text>
+
+  <!-- limiter -->
+  <rect x="624" y="234" width="225" height="115" rx="17" class="card"/>
+  <rect x="624" y="234" width="225" height="10" rx="5" fill="#2c8fb8"/>
+  <text x="644" y="278" class="head">Tenant limiter</text>
+  <text x="644" y="307" class="body">Token bucket</text>
+  <text x="644" y="331" class="small">Admit or return 429</text>
+
+  <!-- deadline -->
+  <rect x="874" y="234" width="271" height="115" rx="17" class="card"/>
+  <rect x="874" y="234" width="271" height="10" rx="5" fill="#2c8fb8"/>
+  <text x="895" y="278" class="head">Request budget</text>
+  <text x="895" y="307" class="body">One total deadline</text>
+  <text x="895" y="331" class="small">Retries use remaining time</text>
+
+  <!-- Scheduler -->
+  <rect x="624" y="398" width="312" height="117" rx="17" fill="#e5f2fc" stroke="#8bbadb" stroke-width="2.5" filter="url(#shadow)"/>
+  <text x="648" y="440" class="head">Scheduler</text>
+  <text x="648" y="470" class="body">Eligible worker + capacity</text>
+  <text x="648" y="495" class="small">EWMA × load factor / weight</text>
+
+  <!-- Registry -->
+  <rect x="371" y="555" width="272" height="135" rx="17" class="card"/>
+  <rect x="371" y="555" width="272" height="10" rx="5" fill="#6d9fbf"/>
+  <text x="392" y="599" class="head">Backend registry</text>
+  <text x="392" y="628" class="body">Model, free slots, EWMA</text>
+  <text x="392" y="655" class="small">GET /v1/backends</text>
+
+  <!-- Breaker -->
+  <rect x="671" y="555" width="222" height="135" rx="17" class="card"/>
+  <rect x="671" y="555" width="222" height="10" rx="5" fill="#6d9fbf"/>
+  <text x="692" y="599" class="head">Circuit breaker</text>
+  <text x="692" y="628" class="body">Open on failures</text>
+  <text x="692" y="655" class="small">Controlled recovery probe</text>
+
+  <!-- Adapters -->
+  <rect x="923" y="555" width="222" height="135" rx="17" class="card"/>
+  <rect x="923" y="555" width="222" height="10" rx="5" fill="#6d9fbf"/>
+  <text x="944" y="599" class="head">HTTP adapters</text>
+  <text x="944" y="628" class="body">Normalize replies</text>
+  <text x="944" y="655" class="small">Mock / optional Ollama</text>
+
+  <!-- Workers -->
+  <rect x="1257" y="234" width="247" height="112" rx="17" fill="white" stroke="#b6d8ca" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="1285" cy="268" r="8" fill="#2ca67b"/>
+  <text x="1304" y="275" class="head">worker-fast</text>
+  <text x="1277" y="309" class="body">Simulated inference</text>
+  <rect x="1257" y="374" width="247" height="112" rx="17" fill="white" stroke="#b6d8ca" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="1285" cy="408" r="8" fill="#2ca67b"/>
+  <text x="1304" y="415" class="head">worker-replica</text>
+  <text x="1277" y="449" class="body">Simulated inference</text>
+  <rect x="1257" y="514" width="247" height="112" rx="17" fill="white" stroke="#b6d8ca" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="1285" cy="548" r="8" fill="#55a1c5"/>
+  <text x="1304" y="555" class="head">Ollama</text>
+  <text x="1277" y="589" class="body">Optional real local model</text>
+  <text x="1258" y="685" class="small">Workers can fail independently;</text>
+  <text x="1258" y="708" class="small">the gateway routes around them.</text>
+
+  <!-- Telemetry -->
+  <rect x="64" y="606" width="227" height="165" rx="18" class="card"/>
+  <rect x="64" y="606" width="227" height="10" rx="5" fill="#9b83c6"/>
+  <text x="84" y="650" class="head">Telemetry</text>
+  <text x="84" y="680" class="body">Structured JSON logs</text>
+  <text x="84" y="710" class="body">GET /metrics</text>
+  <text x="84" y="740" class="small">No prompt or output content</text>
+
+  <!-- Footer legend -->
+  <line x1="66" y1="829" x2="112" y2="829" class="line"/>
+  <text x="128" y="835" class="small">Request / response path</text>
+  <line x1="360" y1="829" x2="406" y2="829" class="state"/>
+  <text x="422" y="835" class="small">State read, update, or telemetry</text>
+  <text x="1165" y="835" class="small">Local demo: two simulated workers</text>
+</svg>

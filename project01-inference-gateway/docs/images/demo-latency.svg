@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+<title id="title">Measured gateway latency across normal, failure, and recovery phases</title>
+<desc id="desc">Locally measured p50 and p95 HTTP latency for simulated inference workers. Every phase completed 40 of 40 requests successfully.</desc>
+<rect width="960" height="560" fill="#ffffff"/>
+<text x="48" y="55" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#12243a">Inference gateway: failure and recovery</text>
+<text x="48" y="88" font-family="Arial,sans-serif" font-size="16" fill="#51647a">Measured loopback HTTP demo · simulated workers · 40 requests per phase</text>
+<rect x="48" y="107" width="864" height="397" rx="16" fill="#f7f9fc" stroke="#dce5ef"/>
+<line x1="170.0" y1="160" x2="170.0" y2="448" stroke="#d9e2eb"/>
+<text x="170.0" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#51647a">0</text>
+<line x1="342.5" y1="160" x2="342.5" y2="448" stroke="#d9e2eb"/>
+<text x="342.5" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#51647a">15</text>
+<line x1="515.0" y1="160" x2="515.0" y2="448" stroke="#d9e2eb"/>
+<text x="515.0" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#51647a">30</text>
+<line x1="687.5" y1="160" x2="687.5" y2="448" stroke="#d9e2eb"/>
+<text x="687.5" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#51647a">45</text>
+<line x1="860.0" y1="160" x2="860.0" y2="448" stroke="#d9e2eb"/>
+<text x="860.0" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#51647a">60</text>
+<text x="515" y="503" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#51647a">End-to-end latency (ms)</text>
+<text x="70" y="210" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#12243a">Normal</text>
+<rect x="170" y="183" width="197.3" height="22" rx="4" fill="#1677b5"/>
+<text x="375.3" y="199" font-family="Arial,sans-serif" font-size="13" fill="#12243a">17.16 ms</text>
+<rect x="170" y="214" width="209.4" height="22" rx="4" fill="#eb7135"/>
+<text x="387.4" y="230" font-family="Arial,sans-serif" font-size="13" fill="#12243a">18.21 ms</text>
+<text x="70" y="296" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#12243a">Fast worker fails</text>
+<rect x="170" y="269" width="479.0" height="22" rx="4" fill="#1677b5"/>
+<text x="657.0" y="285" font-family="Arial,sans-serif" font-size="13" fill="#12243a">41.65 ms</text>
+<rect x="170" y="300" width="666.4" height="22" rx="4" fill="#eb7135"/>
+<text x="844.4" y="316" font-family="Arial,sans-serif" font-size="13" fill="#12243a">57.95 ms</text>
+<text x="70" y="382" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#12243a">Recovered</text>
+<rect x="170" y="355" width="189.9" height="22" rx="4" fill="#1677b5"/>
+<text x="367.9" y="371" font-family="Arial,sans-serif" font-size="13" fill="#12243a">16.51 ms</text>
+<rect x="170" y="386" width="447.8" height="22" rx="4" fill="#eb7135"/>
+<text x="625.8" y="402" font-family="Arial,sans-serif" font-size="13" fill="#12243a">38.94 ms</text>
+<rect x="675" y="120" width="16" height="16" rx="3" fill="#1677b5"/>
+<text x="698" y="134" font-family="Arial,sans-serif" font-size="14" fill="#334b63">p50</text>
+<rect x="762" y="120" width="16" height="16" rx="3" fill="#eb7135"/>
+<text x="785" y="134" font-family="Arial,sans-serif" font-size="14" fill="#334b63">p95</text>
+<text x="48" y="534" font-family="Arial,sans-serif" font-size="13" fill="#51647a">Failure was injected as HTTP 503 on the fast worker; the gateway retried on the replica.</text>
+</svg>

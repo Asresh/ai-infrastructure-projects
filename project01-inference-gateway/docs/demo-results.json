@@ -1,0 +1,100 @@
+{
+  "measured_at_utc": "2026-09-25T04:01:38.502358+00:00",
+  "environment": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "note": "Loopback HTTP, simulated workers; not a model or GPU benchmark."
+  },
+  "scenario": {
+    "fast_worker_ms": 12,
+    "replica_worker_ms": 35,
+    "failure": "fast worker returns HTTP 503",
+    "requests_per_phase": 40
+  },
+  "phases": {
+    "steady": {
+      "requests": 40,
+      "concurrency": 4,
+      "successes": 40,
+      "status_counts": {
+        "200": 40
+      },
+      "backend_counts": {
+        "worker-fast": 40
+      },
+      "retried_requests": 0,
+      "throughput_rps": 232.74,
+      "elapsed_seconds": 0.172,
+      "latency_ms": {
+        "p50": 17.16,
+        "p95": 18.21,
+        "p99": 18.63
+      }
+    },
+    "failure": {
+      "requests": 40,
+      "concurrency": 4,
+      "successes": 40,
+      "status_counts": {
+        "200": 40
+      },
+      "backend_counts": {
+        "worker-replica": 40
+      },
+      "retried_requests": 5,
+      "throughput_rps": 90.57,
+      "elapsed_seconds": 0.442,
+      "latency_ms": {
+        "p50": 41.65,
+        "p95": 57.95,
+        "p99": 59.26
+      }
+    },
+    "recovery": {
+      "requests": 40,
+      "concurrency": 4,
+      "successes": 40,
+      "status_counts": {
+        "200": 40
+      },
+      "backend_counts": {
+        "worker-fast": 37,
+        "worker-replica": 3
+      },
+      "retried_requests": 0,
+      "throughput_rps": 210.71,
+      "elapsed_seconds": 0.19,
+      "latency_ms": {
+        "p50": 16.51,
+        "p95": 38.94,
+        "p99": 43.43
+      }
+    }
+  },
+  "final_backends": [
+    {
+      "name": "worker-fast",
+      "models": [
+        "demo-text"
+      ],
+      "adapter": "contract",
+      "capacity": 4,
+      "inflight": 0,
+      "ewma_ms": 15.24,
+      "circuit": "closed",
+      "failures": 0
+    },
+    {
+      "name": "worker-replica",
+      "models": [
+        "demo-text"
+      ],
+      "adapter": "contract",
+      "capacity": 4,
+      "inflight": 0,
+      "ewma_ms": 38.72,
+      "circuit": "closed",
+      "failures": 0
+    }
+  ]
+}

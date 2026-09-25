@@ -1,0 +1,20 @@
+{
+  "host": "127.0.0.1",
+  "port": 8080,
+  "request_timeout_ms": 30000,
+  "rate_per_minute": 60,
+  "rate_burst": 10,
+  "failure_threshold": 2,
+  "circuit_cooldown_ms": 5000,
+  "backends": [
+    {
+      "name": "local-model",
+      "url": "http://127.0.0.1:11434",
+      "adapter": "ollama",
+      "models": ["gemma3:1b"],
+      "capacity": 2,
+      "weight": 1.0,
+      "timeout_ms": 29000
+    }
+  ]
+}

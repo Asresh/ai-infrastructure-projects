@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" role="img" aria-labelledby="title description">
+  <title id="title">Inference request flow</title>
+  <desc id="description">Sequence diagram showing a client request, validation and tenant admission, worker selection, one or more deadline-bound attempts to a simulated worker or optional Ollama adapter, state updates, the final JSON response, and logs and metrics. Invalid requests are rejected before worker calls.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8fbff"/><stop offset="1" stop-color="#edf5fb"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2876aa"/></marker>
+    <marker id="redarrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#c15b56"/></marker>
+    <marker id="greenarrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2c9476"/></marker>
+    <style>
+      .title{font:700 38px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#102a43}
+      .sub{font:18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#526a7e}
+      .lane{font:700 21px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#153954}
+      .msg{font:17px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#25465e}
+      .small{font:15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#597184}
+      .note{font:16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#35546b}
+      .step{font:700 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+      .life{stroke:#b6c8d8;stroke-width:2;stroke-dasharray:9 9}
+      .line{fill:none;stroke:#2876aa;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow)}
+      .failure{fill:none;stroke:#c15b56;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#redarrow)}
+      .success{fill:none;stroke:#2c9476;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#greenarrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="1100" fill="url(#bg)"/>
+  <text x="66" y="71" class="title">One request, one deadline</text>
+  <text x="66" y="108" class="sub">The gateway may try more than one worker, but the caller receives one final result.</text>
+
+  <!-- Lane backgrounds and headers -->
+  <rect x="72" y="155" width="231" height="839" rx="19" fill="#f4f8fc" stroke="#d3e1ec"/>
+  <rect x="327" y="155" width="271" height="839" rx="19" fill="#f2f9fe" stroke="#c4dcec"/>
+  <rect x="622" y="155" width="298" height="839" rx="19" fill="#f2f9fe" stroke="#c4dcec"/>
+  <rect x="944" y="155" width="276" height="839" rx="19" fill="#f1faf6" stroke="#bfdfce"/>
+  <rect x="1244" y="155" width="283" height="839" rx="19" fill="#faf7fd" stroke="#d9cfea"/>
+  <rect x="72" y="155" width="231" height="75" rx="19" fill="#e3eef7"/>
+  <rect x="327" y="155" width="271" height="75" rx="19" fill="#deeff9"/>
+  <rect x="622" y="155" width="298" height="75" rx="19" fill="#deeff9"/>
+  <rect x="944" y="155" width="276" height="75" rx="19" fill="#e1f4e9"/>
+  <rect x="1244" y="155" width="283" height="75" rx="19" fill="#eee6f7"/>
+  <text x="109" y="202" class="lane">Client</text>
+  <text x="365" y="202" class="lane">HTTP boundary</text>
+  <text x="659" y="202" class="lane">Router + state</text>
+  <text x="983" y="202" class="lane">Worker adapter</text>
+  <text x="1282" y="202" class="lane">Observability</text>
+  <line x1="188" y1="235" x2="188" y2="973" class="life"/>
+  <line x1="462" y1="235" x2="462" y2="973" class="life"/>
+  <line x1="771" y1="235" x2="771" y2="973" class="life"/>
+  <line x1="1082" y1="235" x2="1082" y2="973" class="life"/>
+  <line x1="1386" y1="235" x2="1386" y2="973" class="life"/>
+
+  <!-- 1 request -->
+  <circle cx="91" cy="270" r="18" fill="#2876aa"/><text x="91" y="270" class="step">1</text>
+  <text x="114" y="262" class="msg">POST /v1/infer</text>
+  <text x="114" y="284" class="small">model, prompt, max_tokens</text>
+  <path class="line" d="M206 307 H444"/>
+
+  <!-- 2 validation and admission -->
+  <circle cx="348" cy="347" r="18" fill="#2876aa"/><text x="348" y="347" class="step">2</text>
+  <rect x="374" y="326" width="200" height="71" rx="12" fill="white" stroke="#b6d8e9" stroke-width="2"/>
+  <text x="389" y="353" class="msg">Validate + admit</text>
+  <text x="389" y="378" class="small">Token bucket per tenant</text>
+
+  <!-- rejection branch -->
+  <path class="failure" d="M444 424 H206"/>
+  <text x="223" y="415" class="small" fill="#b15350">Invalid or limited → 4xx / 429</text>
+
+  <!-- 3 deadline -->
+  <circle cx="348" cy="463" r="18" fill="#2876aa"/><text x="348" y="463" class="step">3</text>
+  <text x="377" y="456" class="msg">Start one monotonic deadline</text>
+  <text x="377" y="479" class="small">Remaining time bounds every attempt</text>
+  <path class="line" d="M481 507 H751"/>
+
+  <!-- 4 select -->
+  <circle cx="643" cy="541" r="18" fill="#2876aa"/><text x="643" y="541" class="step">4</text>
+  <rect x="668" y="523" width="228" height="84" rx="12" fill="white" stroke="#b6d8e9" stroke-width="2"/>
+  <text x="684" y="550" class="msg">Pick eligible worker</text>
+  <text x="684" y="574" class="small">Model + slot + breaker</text>
+  <text x="684" y="595" class="small">Score EWMA × load / weight</text>
+
+  <!-- 5 upstream attempt -->
+  <circle cx="643" cy="644" r="18" fill="#2876aa"/><text x="643" y="644" class="step">5</text>
+  <text x="673" y="635" class="msg">Reserve slot and call adapter</text>
+  <text x="673" y="656" class="small">Timeout ≤ remaining deadline</text>
+  <path class="line" d="M790 680 H1062"/>
+
+  <!-- 6 response -->
+  <circle cx="960" cy="722" r="18" fill="#2c9476"/><text x="960" y="722" class="step">6</text>
+  <text x="986" y="715" class="msg">Output or classified error</text>
+  <text x="986" y="738" class="small">Normalize worker reply</text>
+  <path class="success" d="M1062 768 H790"/>
+
+  <!-- 7 observe and bounded retry -->
+  <circle cx="643" cy="806" r="18" fill="#2876aa"/><text x="643" y="806" class="step">7</text>
+  <text x="673" y="800" class="msg">Release slot; update EWMA / breaker</text>
+  <text x="673" y="825" class="small">Retry only if error, budget, and worker permit</text>
+  <path d="M914 824 H930 V608 H896" fill="none" stroke="#c99a46" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#arrow)"/>
+  <rect x="934" y="795" width="264" height="51" rx="11" fill="#fff6df" stroke="#e5c778"/>
+  <text x="949" y="817" class="small">A retry returns to selection</text>
+  <text x="949" y="836" class="small">under the original deadline.</text>
+
+  <!-- 8 final outcome -->
+  <circle cx="643" cy="872" r="18" fill="#2876aa"/><text x="643" y="872" class="step">8</text>
+  <text x="673" y="866" class="msg">Return final outcome</text>
+  <text x="673" y="890" class="small">Success; 502 all failed; 503 none; 504 deadline</text>
+  <path class="line" d="M750 902 H481"/>
+
+  <!-- 9 response -->
+  <circle cx="348" cy="924" r="18" fill="#2876aa"/><text x="348" y="924" class="step">9</text>
+  <text x="374" y="919" class="msg">JSON response + request ID</text>
+  <path class="success" d="M443 953 H206"/>
+
+  <!-- telemetry: out-of-band reporting -->
+  <path d="M481 982 H1232 V315 H1364" fill="none" stroke="#9276b7" stroke-width="2.6" stroke-dasharray="7 7" marker-end="url(#arrow)"/>
+  <rect x="1271" y="344" width="233" height="120" rx="13" fill="white" stroke="#d1c1e4" stroke-width="2"/>
+  <text x="1289" y="374" class="msg">Structured logs</text>
+  <text x="1289" y="403" class="msg">Prometheus metrics</text>
+  <text x="1289" y="436" class="small">No prompts or outputs</text>
+  <text x="1270" y="504" class="small">Request result: one record</text>
+  <text x="1270" y="528" class="small">Attempts: separate signals</text>
+  <text x="1270" y="552" class="small">Linked by request ID</text>
+
+  <!-- Bottom note -->
+  <rect x="72" y="1014" width="1455" height="58" rx="13" fill="#e6f0f8" stroke="#c6dce9"/>
+  <text x="95" y="1049" class="note">Key invariant: a worker slot is released on every path, and a retry never resets the request deadline.</text>
+</svg>

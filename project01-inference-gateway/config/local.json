@@ -1,0 +1,32 @@
+{
+  "host": "127.0.0.1",
+  "port": 8080,
+  "request_timeout_ms": 2500,
+  "max_body_bytes": 65536,
+  "max_prompt_chars": 8192,
+  "max_tokens": 1024,
+  "rate_per_minute": 120,
+  "rate_burst": 20,
+  "failure_threshold": 2,
+  "circuit_cooldown_ms": 1000,
+  "backends": [
+    {
+      "name": "worker-fast",
+      "url": "http://127.0.0.1:9001",
+      "adapter": "contract",
+      "models": ["demo-text"],
+      "capacity": 4,
+      "weight": 1.0,
+      "timeout_ms": 1000
+    },
+    {
+      "name": "worker-replica",
+      "url": "http://127.0.0.1:9002",
+      "adapter": "contract",
+      "models": ["demo-text"],
+      "capacity": 4,
+      "weight": 1.0,
+      "timeout_ms": 1000
+    }
+  ]
+}
